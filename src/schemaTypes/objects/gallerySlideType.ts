@@ -28,7 +28,7 @@ export const gallerySlideType = defineType({
     }),
   ],
   components: {
-    input: CanvasGalleryInput,
+    input: CanvasGalleryInput as any,
   },
   preview: {
     select: {
