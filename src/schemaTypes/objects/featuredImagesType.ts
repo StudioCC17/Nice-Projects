@@ -40,6 +40,6 @@ export const featuredImagesType = defineType({
     }),
   ],
   components: {
-    input: CanvasFeaturedInput,
+    input: CanvasFeaturedInput as any,
   },
 })
