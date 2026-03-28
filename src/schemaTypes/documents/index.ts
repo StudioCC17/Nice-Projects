@@ -1,0 +1,1 @@
+export {projectType} from './projectType'

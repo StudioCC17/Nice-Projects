@@ -1,0 +1,5 @@
+export {featuredImagesType} from './featuredImagesType'
+export {gallerySlideType} from './gallerySlideType'
+export {infoSectionType} from './infoSectionType'
+export {positionedImageType} from './positionedImageType'
+export {pressItemType} from './pressItemType'

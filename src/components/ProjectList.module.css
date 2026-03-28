@@ -1,0 +1,206 @@
+/* ─────────────────────────────────────────────────────────────
+   ProjectList
+   ───────────────────────────────────────────────────────────── */
+
+.projectsList {
+  padding-top: 6vh;
+  padding-bottom: 15vh;
+}
+
+/* ── Project Section ────────────────────────────────────────── */
+
+.project {
+  padding-bottom: 10vh;
+}
+
+.project:first-child {
+  padding-top: 6vh;
+}
+
+.projectLink {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+
+/* ── Canvas ─────────────────────────────────────────────────── */
+
+.canvas {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+}
+
+.imageWrapper {
+  position: absolute;
+}
+
+.image {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* ── Project Title ──────────────────────────────────────────── */
+
+.projectTitle {
+  display: block;
+  font-family: var(--mono-font);
+  font-size: var(--body-font-size-mono);
+  color: var(--color-red);
+  padding-top: 5px;
+}
+
+.arrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  vertical-align: super;
+  padding-left: 2px;
+  display: none;
+  position: absolute;
+}
+
+.projectLink:hover .arrow {
+  display: inline-block;
+  position: absolute;
+}
+
+/* ── Mobile Fallback ────────────────────────────────────────── */
+
+.mobileStack {
+  display: none;
+}
+
+/* ── Responsive ─────────────────────────────────────────────── */
+
+@media (max-width: 768px) {
+  .projectsList {
+    padding-top: 2vh;
+    padding-bottom: 8vh;
+  }
+
+  .project {
+    padding-bottom: 5vh;
+  }
+
+  .project:first-child {
+    padding-top: 2vh;
+  }
+
+  .canvas {
+    display: none;
+  }
+
+  .mobileStack {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    padding: 0 3vw;
+  }
+
+  .mobileStack > div:first-child {
+    margin-top: 0;
+    position: relative;
+    z-index: 2;
+  }
+
+  .mobileStack > div:nth-child(odd) {
+    padding-right: 15vw;
+  }
+
+  .mobileStack > div:nth-child(even) {
+    padding-left: 15vw;
+  }
+
+  .mobileStack .image {
+    width: 100%;
+  }
+
+  .mobileStack .projectTitle {
+    position: relative;
+    z-index: 2;
+  }
+
+  .projectTitle {
+    font-size: 14px;
+    padding-top: 4px;
+    padding-bottom: 0;
+  }
+}
+
+@media (max-width: 480px) {
+
+.mobileStack > div:nth-child(n+2) .projectTitle {
+    display: none;
+  }
+  
+  .mobileStack > div:nth-child(odd) {
+    padding-right: 10vw;
+  }
+
+  .mobileStack > div:nth-child(even) {
+    padding-left: 10vw;
+  }
+
+  .mobileStack > div {
+    margin-top: -5vh;
+  }
+
+  .mobileStack > div:first-child {
+    margin-top: 0;
+  }
+
+.mobileStack > div:nth-child(n+2) {
+    display: flex;
+    justify-content: flex-end;
+    padding-left: 0;
+    padding-right: 5vw;
+    position: relative;
+    z-index: 3;
+  }
+
+  .mobileStack > div:nth-child(n+2) .image {
+    width: 45%;
+  }
+
+  /* Hide third image */
+  .mobileStack > div:nth-child(n+3) {
+    display: none;
+  }
+
+  /* Even projects — flip secondary to left, no overlap to protect title */
+  .project:nth-child(even) .mobileStack > div:first-child {
+    padding-left: 20vw;
+    padding-right: 0;
+  }
+
+  .project:nth-child(even) .mobileStack > div:nth-child(2) {
+    justify-content: flex-start;
+    margin-top: 2vh;
+  }
+
+  /* Every 3rd project — larger secondary */
+  .project:nth-child(3n) .mobileStack > div:nth-child(2) .image {
+    width: 65%;
+  }
+
+  /* Every 4th project — smaller primary, offset right */
+  .project:nth-child(4n) .mobileStack > div:first-child {
+    padding-left: 10vw;
+    padding-right: 0;
+  }
+
+  .project:nth-child(4n) .mobileStack > div:first-child .image {
+    width: 85%;
+  }
+
+  /* Every 5th project — full width primary, tiny secondary */
+  .project:nth-child(5n) .mobileStack > div:first-child {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .project:nth-child(5n) .mobileStack > div:nth-child(2) .image {
+    width: 40%;
+  }
+}
