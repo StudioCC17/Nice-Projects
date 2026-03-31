@@ -47,7 +47,7 @@ export function LandingSplash({logoUrl, logoMobileUrl, images, onLogoShrunk, onS
   }, [images])
 
   // Desktop: 20-40vw, Mobile: 55-75vw
-  const [randomLayout, setRandomLayout] = useState({width: 0, top: 0, left: 0})
+const [randomLayout, setRandomLayout] = useState<{width: number, top: number, left: number} | null>(null)
 
   useEffect(() => {
     const mobile = window.innerWidth <= 1024
@@ -124,7 +124,7 @@ export function LandingSplash({logoUrl, logoMobileUrl, images, onLogoShrunk, onS
   return (
     <>
       <div ref={sectionRef} className={styles.splash} onClick={handleClick}>
-        {randomImage && (
+       {randomImage && randomLayout && (
           <div
             className={styles.imageWrapper}
             style={{

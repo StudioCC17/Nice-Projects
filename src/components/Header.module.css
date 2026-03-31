@@ -42,7 +42,7 @@
 
 .navButton {
   font-family: var(--font-body);
-  font-size: var(--text-body-sm);
+  font-size: var(--text-body);
   color: var(--color-red);
   background: none;
   border: none;
