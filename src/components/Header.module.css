@@ -9,12 +9,6 @@
   align-items: flex-start;
   padding: 22px var(--page-padding) 0;
   pointer-events: none;
-  animation: headerFadeIn 0.32s ease-in-out;
-}
-
-@keyframes headerFadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
 }
 
 .logoContainer {
@@ -28,10 +22,7 @@
 .logo {
   width: 40vw;
   height: auto;
-  transition: all 0.5s ease-in-out;
-  transition-delay: 0.1s;
 }
-
 .nav {
   position: fixed;
   top: 22px;
@@ -49,9 +40,7 @@
   padding: 0;
 }
 
-.navButton:hover {
-  opacity: 0.7;
-}
+
 
 /* Mobile logo toggle */
 

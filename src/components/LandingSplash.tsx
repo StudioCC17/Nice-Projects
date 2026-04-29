@@ -31,6 +31,7 @@ function randomBetween(min: number, max: number): number {
 export function LandingSplash({logoUrl, logoMobileUrl, images, onLogoShrunk, onScrolledPast, onStudioClick}: LandingSplashProps) {
   const [logoShrunk, setLogoShrunk] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
+  const [imageLoaded, setImageLoaded] = useState(false)
   const sectionRef = useRef<HTMLDivElement>(null)
   const hasTriggered = useRef(false)
 
@@ -46,16 +47,46 @@ export function LandingSplash({logoUrl, logoMobileUrl, images, onLogoShrunk, onS
     return images[Math.floor(Math.random() * images.length)]
   }, [images])
 
-  // Desktop: 20-40vw, Mobile: 55-75vw
-const [randomLayout, setRandomLayout] = useState<{width: number, top: number, left: number} | null>(null)
+const [randomLayout, setRandomLayout] = useState<{
+    width: number
+    top: number
+    left: number
+  } | null>(null)
 
   useEffect(() => {
+    if (!randomImage) return
+
     const mobile = window.innerWidth <= 1024
-    const width = mobile ? randomBetween(40, 80) : randomBetween(30, 55)
-    const top = mobile ? randomBetween(5, 40) : randomBetween(3, 30)
-    const left = mobile ? randomBetween(3, 95 - width) : randomBetween(0, 95 - width)
+    const vwToVh = window.innerWidth / window.innerHeight
+
+    const dims = randomImage.asset.metadata?.dimensions
+    const imgAspect = dims && dims.height > 0 ? dims.width / dims.height : 1
+
+    const padX = 3
+    const padY = 5
+
+    const minW = mobile ? 45 : 25
+    const maxW = mobile ? 80 : 60
+
+    let width = randomBetween(minW, maxW)
+    let heightVh = (width / imgAspect) * vwToVh
+    const maxHeightVh = 100 - padY * 2
+
+    if (heightVh > maxHeightVh) {
+      const widthCeiling = (maxHeightVh / vwToVh) * imgAspect
+      const safeMax = Math.max(minW, Math.min(maxW, widthCeiling))
+      width = randomBetween(minW, safeMax)
+      heightVh = (width / imgAspect) * vwToVh
+    }
+
+    const maxLeft = 100 - width - padX
+    const maxTop = 100 - heightVh - padY
+
+    const left = randomBetween(padX, Math.max(padX, maxLeft))
+    const top = randomBetween(padY, Math.max(padY, maxTop))
+
     setRandomLayout({width, top, left})
-  }, [])
+  }, [randomImage])
 
   const triggerShrink = useCallback(() => {
     if (hasTriggered.current) return
@@ -126,7 +157,7 @@ const [randomLayout, setRandomLayout] = useState<{width: number, top: number, le
       <div ref={sectionRef} className={styles.splash} onClick={handleClick}>
        {randomImage && randomLayout && (
           <div
-            className={styles.imageWrapper}
+            className={`${styles.imageWrapper} ${imageLoaded ? styles.imageLoaded : ''}`}
             style={{
               position: 'absolute',
               width: `${randomLayout.width}vw`,
@@ -135,9 +166,18 @@ const [randomLayout, setRandomLayout] = useState<{width: number, top: number, le
             }}
           >
             <img
+              ref={(el) => {
+                if (el?.complete && el.naturalWidth > 0) {
+                  el.decode().then(() => setImageLoaded(true)).catch(() => setImageLoaded(true))
+                }
+              }}
               src={`${randomImage.asset.url}?w=1200&auto=format`}
               alt=""
               className={styles.image}
+              onLoad={(e) => {
+                const img = e.currentTarget
+                img.decode().then(() => setImageLoaded(true)).catch(() => setImageLoaded(true))
+              }}
             />
           </div>
         )}

@@ -8,7 +8,11 @@
 
 .imageWrapper {
   opacity: 0;
-  animation: imageFadeIn 0.5s ease-in-out 0.2s forwards;
+  transition: opacity 0.35s ease-in-out 0.5s;
+}
+
+.imageLoaded {
+  opacity: 1;
 }
 
 .image {
@@ -17,38 +21,42 @@
   display: block;
 }
 
-@keyframes imageFadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
+/* ── Logo ───────────────────────────────────────────────────── */
 
 .logoWrapper {
   position: fixed;
   top: 50%;
   left: 50%;
+  width: 67vw;                    /* desktop default */
   transform: translate(-50%, -50%);
   z-index: 201;
   pointer-events: none;
-  transition: top 0.5s ease-in-out, transform 0.5s ease-in-out;
-  transition-delay: 0.1s;
-}
-
-.logo {
-  width: 67vw;
-  height: auto;
-  display: block;
-  transition: width 0.5s ease-in-out;
-  transition-delay: 0.1s;
+  opacity: 0;
+  animation: logoFadeIn 0.4s ease-in-out 0.3s forwards;
+  transition:
+    top 0.5s ease-in-out 0.1s,
+    width 0.5s ease-in-out 0.1s,
+    transform 0.5s ease-in-out 0.1s;
 }
 
 .logoShrunk {
   top: 10px;
+  width: 40vw;                    /* desktop shrunk */
   transform: translate(-50%, 0);
 }
 
-.logoShrunk .logo {
-  width: 40vw;
+.logo {
+  width: 100%;
+  height: auto;
+  display: block;
 }
+
+@keyframes logoFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* ── Nav ────────────────────────────────────────────────────── */
 
 .splashNav {
   position: fixed;
@@ -67,37 +75,25 @@
   padding: 0;
 }
 
-.splashNavButton:hover {
-  opacity: 0.7;
-}
 
-/* Mobile logo toggle */
+
+/* ── Mobile logo toggle ─────────────────────────────────────── */
 
 .mobileLogo {
   display: none;
 }
 
+/* ── Tablet & Mobile ────────────────────────────────────────── */
+
 @media (max-width: 1024px) {
-  .desktopLogo {
-    display: none;
-  }
+  .desktopLogo { display: none; }
+  .mobileLogo { display: block; }
 
-  .mobileLogo {
-    display: block;
-  }
-
-  .logoShrunk .logo {
-    width: 60vw;
-  }
+  .logoWrapper { width: 80vw; }
+  .logoShrunk { width: 60vw; }
 }
 
 @media (max-width: 768px) {
-  .logo {
-    width: 80vw;
-  }
-
-  .logoShrunk .logo {
-    width: 60vw;
-  }
-  
+  .logoWrapper { width: 80vw; }
+  .logoShrunk { width: 60vw; }
 }

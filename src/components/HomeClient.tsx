@@ -1,6 +1,6 @@
 'use client'
 
-import {useEffect, useRef, useState} from 'react'
+import {useEffect, useLayoutEffect, useRef, useState} from 'react'
 import {Header} from '@/components/Header'
 import {LandingSplash} from '@/components/LandingSplash'
 import {ProjectList} from '@/components/ProjectList'
@@ -24,6 +24,7 @@ export function HomeClient({settings, projects, studio}: HomeClientProps) {
   const [isStudioView, setIsStudioView] = useState(false)
   const [isNavigating, setIsNavigating] = useState(false)
   const [splashActive, setSplashActive] = useState(!returning.current)
+  const [isReturningFade, setIsReturningFade] = useState(returning.current)
 
   const scrollBeforeStudio = useRef(0)
 
@@ -32,7 +33,7 @@ export function HomeClient({settings, projects, studio}: HomeClientProps) {
   const landingImages = settings?.landingImages
   const hasSplash = logoUrl && landingImages?.length > 0
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!returning.current) return
 
     const saved = sessionStorage.getItem('scrollPosition')
@@ -40,7 +41,15 @@ export function HomeClient({settings, projects, studio}: HomeClientProps) {
 
     const scrollY = parseInt(saved, 10)
     sessionStorage.removeItem('scrollPosition')
-    window.scrollTo({top: scrollY, behavior: 'instant'})
+    window.scrollTo(0, scrollY)
+  }, [])
+
+  useEffect(() => {
+    if (!returning.current) return
+    // Wait one paint at opacity: 0, then flip to opacity: 1 so the transition fires
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => setIsReturningFade(false))
+    })
   }, [])
 
   const handleToggleView = () => {
@@ -57,23 +66,25 @@ export function HomeClient({settings, projects, studio}: HomeClientProps) {
     }
   }, [isStudioView])
 
-  const showHeader = !hasSplash || !splashActive
+const showHeader = !hasSplash || !splashActive
+const shouldFadeHeader = returning.current
 
-  return (
-    <>
-      {showHeader && (
-        <Header
-          logoUrl={logoUrl}
-          logoMobileUrl={logoMobileUrl}
-          isStudioView={isStudioView}
-          onToggleView={handleToggleView}
-          isNavigating={isNavigating}
-        />
-      )}
+return (
+  <>
+    {showHeader && (
+      <Header
+        logoUrl={logoUrl}
+        logoMobileUrl={logoMobileUrl}
+        isStudioView={isStudioView}
+        onToggleView={handleToggleView}
+        isNavigating={isNavigating}
+        shouldFade={shouldFadeHeader}
+      />
+    )}
 
       <main className={styles.main}>
         <div
-          className={`${styles.workView} ${isStudioView ? styles.hidden : ''} ${isNavigating ? styles.fadeOut : ''}`}
+          className={`${styles.workView} ${isStudioView ? styles.hidden : ''} ${isNavigating ? styles.fadeOut : ''} ${isReturningFade ? styles.returning : ''}`}
         >
           {hasSplash && splashActive && (
             <LandingSplash

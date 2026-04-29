@@ -4,12 +4,16 @@
 }
 
 .workView {
-  animation: fadeIn 0.32s ease-in-out;
+  /* no animation — instant show/hide */
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+.workView.returning {
+  opacity: 0;
+  transition: opacity 0.4s ease-in-out;
+}
+
+.workView {
+  transition: opacity 0s;
 }
 
 .hidden {

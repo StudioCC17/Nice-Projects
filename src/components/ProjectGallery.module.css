@@ -16,7 +16,8 @@
   position: fixed;
   inset: 0;
   width: 100vw;
-  height: 100vh;
+  height: 100vh;        
+  height: 100dvh;        
   background: var(--color-bg);
   overflow: hidden;
   animation: galleryFadeIn 0.3s ease-in-out;
@@ -201,7 +202,7 @@
   left: 0;
   right: 0;
   z-index: 10;
-  padding: 0 3vw 25px;
+  padding: 0 3vw calc(25px + env(safe-area-inset-bottom));
   pointer-events: none;
   transition: opacity 0.3s ease-in-out;
 }
@@ -246,10 +247,6 @@
   text-decoration: none;
 }
 
-.pressLink:hover {
-  opacity: 0.7;
-}
-
 .pressItem {
   color: var(--color-red);
 }
@@ -261,7 +258,7 @@
 
 .slideCounter {
   position: absolute;
-  bottom: 25px;
+  bottom: calc(25px + env(safe-area-inset-bottom));
   right: 3vw;
   font-family: var(--font-body);
   font-size: var(--text-body);
@@ -283,7 +280,7 @@
   z-index: 999;
   background: var(--color-bg);
   overflow-y: auto;
-  padding: 0 5vw;
+  padding: 0 5vw calc(env(safe-area-inset-bottom));
   animation: overlayFadeIn 0.25s ease-in-out;
 }
 
@@ -423,7 +420,7 @@
   }
 
   .bottomBar {
-    padding: 0 5vw 30px;
+    padding: 0 5vw calc(30px + env(safe-area-inset-bottom));
     display: flex;
     justify-content: space-between;
     align-items: flex-end;
