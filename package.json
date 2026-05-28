@@ -11,7 +11,11 @@
   "dependencies": {
     "@portabletext/react": "^6.0.3",
     "@sanity/image-url": "^1.2.0",
+    "@sanity/orderable-document-list": "^1.5.1",
+    "@sanity/presentation": "^2.0.0",
+    "@sanity/preview-url-secret": "^4.0.6",
     "@sanity/vision": "^4.22.0",
+    "@sanity/visual-editing": "^5.3.4",
     "next": "16.1.6",
     "next-sanity": "^11.6.12",
     "react": "19.2.3",

@@ -1,36 +1,42 @@
 import {createClient} from 'next-sanity'
-import imageUrlBuilder from '@sanity/image-url'
-import type {SanityImageSource} from '@sanity/image-url/lib/types/types'
+import {defineLive} from 'next-sanity/live'
 
-/**
- * Sanity client instance.
- *
- * Used for fetching data in Next.js server components and
- * API routes. Uses CDN for production reads.
- *
- * @see https://www.sanity.io/docs/js-client
- */
+const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID!
+const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET!
+const apiVersion = '2024-01-01'
+const token = process.env.SANITY_API_READ_TOKEN
+
 export const client = createClient({
-  projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID!,
-  dataset: process.env.NEXT_PUBLIC_SANITY_DATASET!,
-  apiVersion: '2024-01-01',
+  projectId,
+  dataset,
+  apiVersion,
   useCdn: false,
+  perspective: 'published',
+  stega: {
+    studioUrl: '/studio',
+  },
 })
 
-/**
- * Image URL builder.
- *
- * Generates optimised image URLs from Sanity image references.
- * Sanity automatically serves the best format (WebP/AVIF) based
- * on browser capabilities when using `auto('format')`.
- *
- * Usage:
- *   urlFor(image).width(800).auto('format').url()
- *
- * @see https://www.sanity.io/docs/image-url
- */
-const builder = imageUrlBuilder(client)
-
-export function urlFor(source: SanityImageSource) {
-  return builder.image(source)
+export function getClient(isDraftMode: boolean) {
+  if (isDraftMode) {
+    if (!token) {
+      throw new Error('SANITY_API_READ_TOKEN is required for draft mode')
+    }
+    return createClient({
+      projectId,
+      dataset,
+      apiVersion,
+      useCdn: false,
+      perspective: 'drafts',
+      token,
+      stega: {studioUrl: '/studio'},
+    })
+  }
+  return client
 }
+
+export const {sanityFetch, SanityLive} = defineLive({
+  client: client.withConfig({apiVersion: 'vX'}),
+  serverToken: token,
+  browserToken: token,
+})

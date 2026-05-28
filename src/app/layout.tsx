@@ -1,4 +1,7 @@
 import type {Metadata} from 'next'
+import {draftMode} from 'next/headers'
+import VisualEditing from './VisualEditingClient'
+import {SanityLive} from '@/lib/sanity'
 
 import '@/app/globals.css'
 
@@ -8,7 +11,9 @@ export const metadata: Metadata = {
     'Nice Projects create welcoming, enjoyable, inspiring homes, workplaces, retail and hospitality spaces.',
 }
 
-export default function RootLayout({children}: {children: React.ReactNode}) {
+export default async function RootLayout({children}: {children: React.ReactNode}) {
+  const dm = await draftMode()
+
   return (
     <html lang="en">
       <head>
@@ -30,7 +35,11 @@ export default function RootLayout({children}: {children: React.ReactNode}) {
           __html: `if ('scrollRestoration' in history) { history.scrollRestoration = 'manual'; } window.scrollTo(0, 0);`
         }} />
       </head>
-      <body>{children}</body>
+      <body>
+        {children}
+        <SanityLive />
+        {dm.isEnabled && <VisualEditing portal />}
+      </body>
     </html>
   )
 }

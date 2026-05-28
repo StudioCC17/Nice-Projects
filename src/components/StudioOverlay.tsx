@@ -1,7 +1,7 @@
 'use client'
 
 import {PortableText} from '@portabletext/react'
-import {urlFor} from '@/lib/sanity'
+import {urlFor} from '@/lib/sanity-image'
 import styles from './StudioOverlay.module.css'
 
 interface InfoSection {

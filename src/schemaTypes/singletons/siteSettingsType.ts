@@ -27,9 +27,27 @@ export const siteSettingsType = defineType({
       type: 'image',
       description: 'Alternative logo displayed on mobile devices. If not set, the primary logo is used.',
     }),
+
+    // ── Landing splash images ──
+    defineField({
+      name: 'landingMode',
+      title: 'Landing Image Mode',
+      type: 'string',
+      description:
+        'Choose which pool of images the landing splash picks from. "Random" picks from a wide mix; "Curated" picks from a hand-selected set (often a single project).',
+      options: {
+        list: [
+          {title: 'Random pool', value: 'random'},
+          {title: 'Curated pool', value: 'curated'},
+        ],
+        layout: 'radio',
+      },
+      initialValue: 'random',
+      validation: (rule) => rule.required(),
+    }),
     defineField({
       name: 'landingImages',
-      title: 'Landing Images',
+      title: 'Random Pool',
       type: 'array',
       of: [
         defineArrayMember({
@@ -38,7 +56,20 @@ export const siteSettingsType = defineType({
         }),
       ],
       description:
-        'Pool of images for the landing splash screen. One is chosen at random on each visit.',
+        'Wide pool of images. One is chosen at random on each visit when "Random pool" is selected above.',
+    }),
+    defineField({
+      name: 'curatedPoolImages',
+      title: 'Curated Pool',
+      type: 'array',
+      of: [
+        defineArrayMember({
+          type: 'image',
+          options: {hotspot: true},
+        }),
+      ],
+      description:
+        'Hand-picked images, typically from a single project. One is chosen at random on each visit when "Curated pool" is selected above.',
     }),
   ],
   preview: {

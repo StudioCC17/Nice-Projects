@@ -50,8 +50,8 @@
   --text-h2: 21px;
   --text-h3: 6.75vw;
   --text-body: 21px;
-  --text-body-sm: 18px;
-  --text-caption: 15px;
+  --text-body-sm: 17px;
+  --text-caption: 14px;
 
   /* Spacing */
   --line: 20px;
@@ -195,7 +195,7 @@ p {
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 4;
+  z-index: 999999;
   pointer-events: none;
   transition: opacity 0.25s ease-in-out;
 }

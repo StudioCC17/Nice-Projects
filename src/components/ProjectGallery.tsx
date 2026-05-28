@@ -4,7 +4,7 @@ import {useCallback, useEffect, useRef, useState} from 'react'
 import Link from 'next/link'
 import {useRouter} from 'next/navigation'
 import {PortableText} from '@portabletext/react'
-import {urlFor} from '@/lib/sanity'
+import {urlFor} from '@/lib/sanity-image'
 import styles from './ProjectGallery.module.css'
 
 interface PositionedImage {
@@ -68,6 +68,8 @@ export function ProjectGallery({project, nextProject}: ProjectGalleryProps) {
   const slides = gallery ?? []
   const totalSlides = slides.length
 
+  console.log('[Gallery render]', {slug: project.slug, slidesLength: gallery?.length})
+
   const [currentSlide, setCurrentSlide] = useState(0)
   const [visibleSlide, setVisibleSlide] = useState(0)
   const [showDescription, setShowDescription] = useState(false)
@@ -83,12 +85,7 @@ export function ProjectGallery({project, nextProject}: ProjectGalleryProps) {
   const transitionTimeouts = useRef<NodeJS.Timeout[]>([])
   const hasNavigated = useRef(false)
 
-  useEffect(() => {
-    const check = () => setIsMobile(window.innerWidth <= 1024)
-    check()
-    window.addEventListener('resize', check)
-    return () => window.removeEventListener('resize', check)
-  }, [])
+
 
   const clearTimeouts = useCallback(() => {
     transitionTimeouts.current.forEach(clearTimeout)
@@ -96,8 +93,9 @@ export function ProjectGallery({project, nextProject}: ProjectGalleryProps) {
   }, [])
 
   const fadeImagesIn = useCallback(
-    (slideIndex: number) => {
-      const imageCount = slides[slideIndex]?.images?.length ?? 0
+  (slideIndex: number) => {
+    console.log('[fadeImagesIn called]', slideIndex)
+    const imageCount = slides[slideIndex]?.images?.length ?? 0
       setVisibleImages(new Set())
       setVisibleSlide(slideIndex)
       setSlidePhase('in')
@@ -136,9 +134,10 @@ export function ProjectGallery({project, nextProject}: ProjectGalleryProps) {
   )
 
   const transitionToSlide = useCallback(
-    (nextSlideIndex: number) => {
-      if (isTransitioning) return
-      setIsTransitioning(true)
+  (nextSlideIndex: number) => {
+    console.log('[transitionToSlide called]', nextSlideIndex)
+    if (isTransitioning) return
+    setIsTransitioning(true)
       clearTimeouts()
 
       setSlidePhase('out')
@@ -200,16 +199,17 @@ export function ProjectGallery({project, nextProject}: ProjectGalleryProps) {
     transitionToSlide(nextSlide)
   }, [currentSlide, totalSlides, isTransitioning, isExiting, transitionToSlide])
 
-  const goToPrev = useCallback(() => {
-    if (currentSlide > 0 && !isTransitioning && !isExiting) {
-      setShowTitle(false)
-      hasNavigated.current = true
-      transitionToSlide(currentSlide - 1)
-      if (currentSlide - 1 === 0) {
-        setShowDescription(true)
-      }
-    }
-  }, [currentSlide, isTransitioning, isExiting, transitionToSlide])
+const goToPrev = useCallback(() => {
+  if (isTransitioning || isExiting) return
+  setShowTitle(false)
+  setShowDescription(false)
+  hasNavigated.current = true
+  const prevSlide = currentSlide > 0 ? currentSlide - 1 : totalSlides - 1
+  if (prevSlide === 0) {
+    setShowDescription(true)
+  }
+  transitionToSlide(prevSlide)
+}, [currentSlide, totalSlides, isTransitioning, isExiting, transitionToSlide])
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -301,8 +301,7 @@ export function ProjectGallery({project, nextProject}: ProjectGalleryProps) {
           <h3 className={styles.titleSplashText}>{title}</h3>
         </div>
 
-        <div className={`${styles.cursorZone} ${styles.cursorLeft} ${currentSlide === 0 ? styles.cursorHidden : ''}`} />
-        <div className={`${styles.cursorZone} ${styles.cursorRight}`} />
+        <div className={`${styles.cursorZone} ${styles.cursorLeft}`} /><div className={`${styles.cursorZone} ${styles.cursorRight}`} />
 
         {activeSlide && (
           <>

@@ -1,7 +1,7 @@
 import {defineQuery} from 'next-sanity'
 
 export const HOMEPAGE_QUERY = defineQuery(`
-  *[_type == "project"] | order(order asc) {
+  *[_type == "project"] | order(orderRank) {
     _id,
     title,
     "slug": slug.current,
@@ -74,7 +74,15 @@ export const SETTINGS_QUERY = defineQuery(`
     logoMobile {
       asset-> { url }
     },
+    landingMode,
     landingImages[] {
+      asset-> {
+        _id,
+        url,
+        metadata { dimensions }
+      }
+    },
+    curatedPoolImages[] {
       asset-> {
         _id,
         url,

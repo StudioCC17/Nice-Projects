@@ -2,7 +2,7 @@
 
 import {useCallback, useState} from 'react'
 import {useRouter} from 'next/navigation'
-import {urlFor} from '@/lib/sanity'
+import {urlFor} from '@/lib/sanity-image'
 import styles from './ProjectList.module.css'
 
 interface PositionedImage {

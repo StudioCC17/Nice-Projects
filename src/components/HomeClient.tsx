@@ -28,10 +28,16 @@ export function HomeClient({settings, projects, studio}: HomeClientProps) {
 
   const scrollBeforeStudio = useRef(0)
 
-  const logoUrl = settings?.logo?.asset?.url
-  const logoMobileUrl = settings?.logoMobile?.asset?.url
-  const landingImages = settings?.landingImages
-  const hasSplash = logoUrl && landingImages?.length > 0
+const logoUrl = settings?.logo?.asset?.url
+const logoMobileUrl = settings?.logoMobile?.asset?.url
+const landingMode = settings?.landingMode ?? 'random'
+const landingImages =
+landingMode === 'curated'
+? settings?.curatedPoolImages?.length
+  ? settings.curatedPoolImages
+  : settings?.landingImages // fallback if curated is empty
+: settings?.landingImages
+const hasSplash = logoUrl && landingImages?.length > 0
 
   useLayoutEffect(() => {
     if (!returning.current) return

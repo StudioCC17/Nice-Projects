@@ -1,3 +1,4 @@
+import {orderRankField, orderRankOrdering} from '@sanity/orderable-document-list'
 import {CaseIcon, ComposeIcon, ImageIcon, TagIcon} from '@sanity/icons'
 import {defineArrayMember, defineField, defineType} from 'sanity'
 
@@ -94,7 +95,7 @@ export const projectType = defineType({
         'The project gallery. Each slide is a canvas with 1–3 freely positioned images. Add as many slides as needed.',
     }),
 
-    // ── Meta group ─────────────────────────────────────────
+// ── Meta group ─────────────────────────────────────────
     defineField({
       name: 'press',
       title: 'Press',
@@ -103,23 +104,11 @@ export const projectType = defineType({
       of: [defineArrayMember({type: 'pressItem'})],
       description: 'Publications that have featured this project. Displayed on the project page.',
     }),
-    defineField({
-      name: 'order',
-      title: 'Display Order',
-      type: 'number',
-      group: 'meta',
-      description: 'Controls homepage ordering. Lower numbers appear first.',
-      initialValue: 0,
-      validation: (rule) => rule.integer(),
-    }),
+    orderRankField({type: 'project'}),
   ],
 
-  orderings: [
-    {
-      title: 'Display Order',
-      name: 'displayOrder',
-      by: [{field: 'order', direction: 'asc'}],
-    },
+orderings: [
+    orderRankOrdering,
     {
       title: 'Title A–Z',
       name: 'titleAsc',
@@ -132,12 +121,10 @@ export const projectType = defineType({
       title: 'title',
       media: 'featuredImages.images.0.image',
       photographer: 'photographer',
-      order: 'order',
     },
-    prepare({title, media, photographer, order}) {
-      const orderPrefix = order !== undefined && order !== null ? `${order}. ` : ''
+    prepare({title, media, photographer}) {
       return {
-        title: `${orderPrefix}${title ?? 'Untitled'}`,
+        title: title ?? 'Untitled',
         subtitle: photographer ? `Photo: ${photographer}` : undefined,
         media,
       }

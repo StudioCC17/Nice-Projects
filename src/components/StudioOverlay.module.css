@@ -159,12 +159,14 @@
 /* ── Footer ─────────────────────────────────────────────────── */
 
 .footer {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  column-gap: 50px;
   font-family: var(--font-body);
-  font-size: var(--text-body-sm);
+  font-size: var(--text-body);
   color: var(--color-red);
+  line-height: 1.325;
+  padding-top: 50px
 }
 
 .footerItem {

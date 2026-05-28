@@ -1,19 +1,14 @@
-import {client} from '@/lib/sanity'
+import {sanityFetch} from '@/lib/sanity'
 import {HOMEPAGE_QUERY, SETTINGS_QUERY, STUDIO_QUERY} from '@/lib/queries'
 import {HomeClient} from '@/components/HomeClient'
 
-/**
- * Homepage (Server Component)
- *
- * Fetches site settings, studio info, and projects from Sanity,
- * then passes them to the client-side HomeClient which handles
- * the Studio/Work toggle and rendering.
- */
+export const dynamic = 'force-dynamic'
+
 export default async function HomePage() {
-  const [settings, projects, studio] = await Promise.all([
-    client.fetch(SETTINGS_QUERY),
-    client.fetch(HOMEPAGE_QUERY),
-    client.fetch(STUDIO_QUERY),
+  const [{data: settings}, {data: projects}, {data: studio}] = await Promise.all([
+    sanityFetch({query: SETTINGS_QUERY}),
+    sanityFetch({query: HOMEPAGE_QUERY}),
+    sanityFetch({query: STUDIO_QUERY}),
   ])
 
   return <HomeClient settings={settings} projects={projects} studio={studio} />
