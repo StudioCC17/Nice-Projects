@@ -225,7 +225,7 @@
 
 .description p {
   font-size: var(--text-body-sm);
-  margin-bottom: 8px;
+  margin-bottom: 20px;
 }
 
 .description p:last-child {
@@ -233,7 +233,7 @@
 }
 
 .press {
-  margin-top: 12px;
+  margin-top: 20px;
   font-family: var(--font-body);
   font-size: var(--text-body-sm);
   line-height: 1.6;
