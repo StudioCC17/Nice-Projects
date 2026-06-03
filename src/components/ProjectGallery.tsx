@@ -74,7 +74,7 @@ const FADE_STAGGER = 280
 function PressCredits({press, className}: {press: PressItem[]; className: string}) {
   return (
     <div className={className}>
-      <span className={styles.pressLabel}>Press: </span>
+      <span className={styles.pressLabel}></span>
       {press.map((item, index) => {
         const href = item.url ?? item.fileUrl
         return (
