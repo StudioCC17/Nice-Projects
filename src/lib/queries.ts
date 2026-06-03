@@ -107,7 +107,15 @@ export const STUDIO_QUERY = defineQuery(`
     sections[] {
       _key,
       title,
-      content
+      content[] {
+        ...,
+        markDefs[] {
+          ...,
+          _type == "fileLink" => {
+            "url": file.asset->url
+          }
+        }
+      }
     },
     footerLocations,
     email,

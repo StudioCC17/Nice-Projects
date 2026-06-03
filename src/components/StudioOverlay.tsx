@@ -2,6 +2,7 @@
 
 import {PortableText} from '@portabletext/react'
 import {urlFor} from '@/lib/sanity-image'
+import {portableTextComponents} from './portableTextComponents'
 import styles from './StudioOverlay.module.css'
 
 interface InfoSection {
@@ -56,7 +57,7 @@ export function StudioOverlay({studio}: StudioOverlayProps) {
           {headline && <h2 className={styles.headline}>{headline}</h2>}
           {description && (
             <div className={styles.description}>
-              <PortableText value={description} />
+              <PortableText value={description} components={portableTextComponents} />
             </div>
           )}
         </div>
@@ -83,7 +84,7 @@ export function StudioOverlay({studio}: StudioOverlayProps) {
               <h2 className={styles.sectionTitle}>{section.title}</h2>
               {section.content && (
                 <div className={styles.sectionContent}>
-                  <PortableText value={section.content} />
+                  <PortableText value={section.content} components={portableTextComponents} />
                 </div>
               )}
             </div>
