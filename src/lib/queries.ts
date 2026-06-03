@@ -36,7 +36,8 @@ export const PROJECT_QUERY = defineQuery(`
     press[] {
       _key,
       publication,
-      url
+      url,
+      "fileUrl": file.asset->url
     },
     gallery[] {
       _key,

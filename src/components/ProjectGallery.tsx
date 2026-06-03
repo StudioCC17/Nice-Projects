@@ -37,6 +37,7 @@ interface PressItem {
   _key: string
   publication: string
   url?: string
+  fileUrl?: string
 }
 
 interface Project {
@@ -61,6 +62,37 @@ interface ProjectGalleryProps {
 
 const FADE_DURATION = 200
 const FADE_STAGGER = 280
+
+/**
+ * PressCredits
+ *
+ * Renders the "Press:" line for a project. Each credit links to its
+ * Article URL if present, otherwise to an uploaded PDF (fileUrl), and
+ * falls back to plain text when neither is set. Shared between the
+ * bottom bar and the mobile info overlay so the link logic lives once.
+ */
+function PressCredits({press, className}: {press: PressItem[]; className: string}) {
+  return (
+    <div className={className}>
+      <span className={styles.pressLabel}>Press: </span>
+      {press.map((item, index) => {
+        const href = item.url ?? item.fileUrl
+        return (
+          <span key={item._key}>
+            {href ? (
+              <a href={href} target="_blank" rel="noopener noreferrer" className={styles.pressLink}>{item.publication}</a>
+            ) : (
+              <span className={styles.pressItem}>{item.publication}</span>
+            )}
+            {index < press.length - 1 && (
+              <span className={styles.pressDivider}> / </span>
+            )}
+          </span>
+        )
+      })}
+    </div>
+  )
+}
 
 export function ProjectGallery({project, nextProject}: ProjectGalleryProps) {
   const router = useRouter()
@@ -359,21 +391,7 @@ const goToPrev = useCallback(() => {
             </div>
           )}
           {press && press.length > 0 && (
-            <div className={styles.press}>
-              <span className={styles.pressLabel}>Press: </span>
-              {press.map((item, index) => (
-                <span key={item._key}>
-                  {item.url ? (
-                    <a href={item.url} target="_blank" rel="noopener noreferrer" className={styles.pressLink}>{item.publication}</a>
-                  ) : (
-                    <span className={styles.pressItem}>{item.publication}</span>
-                  )}
-                  {index < press.length - 1 && (
-                    <span className={styles.pressDivider}> / </span>
-                  )}
-                </span>
-              ))}
-            </div>
+            <PressCredits press={press} className={styles.press} />
           )}
         </div>
 
@@ -410,21 +428,7 @@ const goToPrev = useCallback(() => {
               <p className={styles.infoOverlayCredit}>Photography by {photographer}</p>
             )}
             {press && press.length > 0 && (
-              <div className={styles.infoOverlayPress}>
-                <span className={styles.pressLabel}>Press: </span>
-                {press.map((item, index) => (
-                  <span key={item._key}>
-                    {item.url ? (
-                      <a href={item.url} target="_blank" rel="noopener noreferrer" className={styles.pressLink}>{item.publication}</a>
-                    ) : (
-                      <span className={styles.pressItem}>{item.publication}</span>
-                    )}
-                    {index < press.length - 1 && (
-                      <span className={styles.pressDivider}> / </span>
-                    )}
-                  </span>
-                ))}
-              </div>
+              <PressCredits press={press} className={styles.infoOverlayPress} />
             )}
           </div>
         </div>

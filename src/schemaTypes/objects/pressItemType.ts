@@ -5,7 +5,8 @@ import {defineField, defineType} from 'sanity'
  * pressItemType
  *
  * A single press credit for a project.
- * Publication name with an optional link to the article.
+ * Publication name with an optional link, which can be either
+ * an external article URL or an uploaded PDF.
  */
 export const pressItemType = defineType({
   name: 'pressItem',
@@ -28,13 +29,21 @@ export const pressItemType = defineType({
       validation: (rule) =>
         rule.uri({allowRelative: false, scheme: ['http', 'https']}),
     }),
+    defineField({
+      name: 'file',
+      title: 'PDF',
+      type: 'file',
+      options: {accept: 'application/pdf'},
+      description:
+        'Upload a PDF to link to instead, for press with no online article. If an Article URL is set above, the URL takes precedence.',
+    }),
   ],
   preview: {
-    select: {title: 'publication', url: 'url'},
-    prepare({title, url}) {
+    select: {title: 'publication', url: 'url', file: 'file'},
+    prepare({title, url, file}) {
       return {
         title: title ?? 'Untitled',
-        subtitle: url ? 'Linked' : 'No link',
+        subtitle: url ? 'Linked (URL)' : file ? 'Linked (PDF)' : 'No link',
       }
     },
   },
