@@ -197,6 +197,19 @@ export function ProjectGallery({project, nextProject}: ProjectGalleryProps) {
   )
 
   useEffect(() => {
+    const mq = window.matchMedia('(max-width: 1024px)')
+    const update = () => setIsMobile(mq.matches)
+    update()
+    mq.addEventListener('change', update)
+    return () => mq.removeEventListener('change', update)
+  }, [])
+
+  useEffect(() => {
+    fadeImagesIn(0)
+    return clearTimeouts
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
     fadeImagesIn(0)
     return clearTimeouts
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
