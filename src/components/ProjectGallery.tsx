@@ -1,6 +1,6 @@
 'use client'
 
-import {useCallback, useEffect, useRef, useState} from 'react'
+import {useCallback, useEffect, useMemo, useRef, useState} from 'react'
 import Link from 'next/link'
 import {useRouter} from 'next/navigation'
 import {PortableText} from '@portabletext/react'
@@ -60,6 +60,20 @@ interface ProjectGalleryProps {
   nextProject: NextProject | null
 }
 
+/**
+ * A single navigable view in the gallery.
+ *
+ * On desktop this is one slide (all of its positioned images, exactly as
+ * authored). On mobile each image becomes its own view, so navigation moves
+ * image-by-image and one image is shown, centered, per screen. Desktop and
+ * mobile share the same navigation, counter and preload logic by operating
+ * over this list rather than over slides directly.
+ */
+interface SlideView {
+  key: string
+  images: PositionedImage[]
+}
+
 const FADE_DURATION = 200
 const FADE_STAGGER = 280
 
@@ -98,7 +112,6 @@ export function ProjectGallery({project, nextProject}: ProjectGalleryProps) {
   const router = useRouter()
   const {title, gallery, description, photographer, press} = project
   const slides = gallery ?? []
-  const totalSlides = slides.length
 
   console.log('[Gallery render]', {slug: project.slug, slidesLength: gallery?.length})
 
@@ -114,6 +127,22 @@ export function ProjectGallery({project, nextProject}: ProjectGalleryProps) {
   const [visibleImages, setVisibleImages] = useState<Set<number>>(new Set())
   const [isMobile, setIsMobile] = useState(false)
 
+  // Desktop: one view per slide (identical grouping to the source data).
+  // Mobile: one view per image, so each screen shows a single centered image.
+  const slideViews = useMemo<SlideView[]>(() => {
+    if (isMobile) {
+      return slides.flatMap((slide) =>
+        slide.images.map((image) => ({
+          key: `${slide._key}-${image._key}`,
+          images: [image],
+        })),
+      )
+    }
+    return slides.map((slide) => ({key: slide._key, images: slide.images}))
+  }, [slides, isMobile])
+
+  const totalViews = slideViews.length
+
   const transitionTimeouts = useRef<NodeJS.Timeout[]>([])
   const hasNavigated = useRef(false)
 
@@ -127,7 +156,7 @@ export function ProjectGallery({project, nextProject}: ProjectGalleryProps) {
   const fadeImagesIn = useCallback(
   (slideIndex: number) => {
     console.log('[fadeImagesIn called]', slideIndex)
-    const imageCount = slides[slideIndex]?.images?.length ?? 0
+    const imageCount = slideViews[slideIndex]?.images?.length ?? 0
       setVisibleImages(new Set())
       setVisibleSlide(slideIndex)
       setSlidePhase('in')
@@ -162,7 +191,7 @@ export function ProjectGallery({project, nextProject}: ProjectGalleryProps) {
       }, imageCount * FADE_STAGGER + FADE_DURATION + initialDelay)
       transitionTimeouts.current.push(doneTimeout)
     },
-    [slides, isMobile],
+    [slideViews, isMobile],
   )
 
   const transitionToSlide = useCallback(
@@ -204,15 +233,13 @@ export function ProjectGallery({project, nextProject}: ProjectGalleryProps) {
     return () => mq.removeEventListener('change', update)
   }, [])
 
+  // Initial reveal. Re-runs once when the viewport mode (isMobile) settles
+  // after mount, so the first view fades in using the correct set of views
+  // (grouped slide on desktop, single image on mobile).
   useEffect(() => {
     fadeImagesIn(0)
     return clearTimeouts
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
-
-  useEffect(() => {
-    fadeImagesIn(0)
-    return clearTimeouts
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [isMobile]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -237,24 +264,24 @@ export function ProjectGallery({project, nextProject}: ProjectGalleryProps) {
     setShowTitle(false)
     setShowDescription(false)
     hasNavigated.current = true
-    const nextSlide = currentSlide < totalSlides - 1 ? currentSlide + 1 : 0
+    const nextSlide = currentSlide < totalViews - 1 ? currentSlide + 1 : 0
     if (nextSlide === 0) {
       setShowDescription(true)
     }
     transitionToSlide(nextSlide)
-  }, [currentSlide, totalSlides, isTransitioning, isExiting, transitionToSlide])
+  }, [currentSlide, totalViews, isTransitioning, isExiting, transitionToSlide])
 
 const goToPrev = useCallback(() => {
   if (isTransitioning || isExiting) return
   setShowTitle(false)
   setShowDescription(false)
   hasNavigated.current = true
-  const prevSlide = currentSlide > 0 ? currentSlide - 1 : totalSlides - 1
+  const prevSlide = currentSlide > 0 ? currentSlide - 1 : totalViews - 1
   if (prevSlide === 0) {
     setShowDescription(true)
   }
   transitionToSlide(prevSlide)
-}, [currentSlide, totalSlides, isTransitioning, isExiting, transitionToSlide])
+}, [currentSlide, totalViews, isTransitioning, isExiting, transitionToSlide])
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -281,9 +308,9 @@ const goToPrev = useCallback(() => {
 
   useEffect(() => {
     const nextIndex = currentSlide + 1
-    if (nextIndex >= totalSlides) return
+    if (nextIndex >= totalViews) return
 
-    const nextSlide = slides[nextIndex]
+    const nextSlide = slideViews[nextIndex]
     if (!nextSlide?.images) return
 
     nextSlide.images.forEach((img) => {
@@ -294,7 +321,7 @@ const goToPrev = useCallback(() => {
         mobile.src = urlFor(img.image).width(800).auto('format').url()
       }
     })
-  }, [currentSlide, totalSlides, slides])
+  }, [currentSlide, totalViews, slideViews])
 
   const handleGalleryClick = useCallback(
     (e: React.MouseEvent) => {
@@ -312,7 +339,7 @@ const goToPrev = useCallback(() => {
     [goToNext, goToPrev, showInfoOverlay],
   )
 
-  if (totalSlides === 0) {
+  if (totalViews === 0) {
     return (
       <div className={styles.empty}>
         <p>No gallery slides yet.</p>
@@ -321,7 +348,7 @@ const goToPrev = useCallback(() => {
     )
   }
 
-  const activeSlide = slides[visibleSlide]
+  const activeSlide = slideViews[visibleSlide] ?? slideViews[0]
   const hasInfo = (description && description.length > 0) || (press && press.length > 0)
   const topBarHidden = !isMobile && currentSlide === 0
 
@@ -374,11 +401,11 @@ const goToPrev = useCallback(() => {
               ))}
             </div>
 
-            <div className={styles.slideMobile} data-slide={visibleSlide % 6}>
+            <div className={styles.slideMobile}>
               {activeSlide.images.map((img, imgIndex) => (
                 <div
                   key={img._key}
-                  className={`${visibleImages.has(imgIndex) ? styles.imageVisible : styles.imageHidden}`}
+                  className={`${styles.slideMobileItem} ${visibleImages.has(imgIndex) ? styles.imageVisible : styles.imageHidden}`}
                 >
                   <img
                     src={urlFor(img.image).width(800).auto('format').url()}
@@ -420,7 +447,7 @@ const goToPrev = useCallback(() => {
         )}
 
         <div className={styles.slideCounter}>
-          {currentSlide + 1}/{totalSlides}
+          {currentSlide + 1}/{totalViews}
         </div>
       </footer>
 
