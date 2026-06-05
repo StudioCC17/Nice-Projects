@@ -198,7 +198,12 @@
   }
 
   .infoGrid {
+    columns: 1;
+    column-gap: 0;
+  }
+
+  .footer {
     grid-template-columns: 1fr;
-    gap: 32px;
+    row-gap: 16px;
   }
 }
